@@ -1,24 +1,44 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Web.Api.Core.Domain.Entities;
+using Web.Api.Core.Interfaces.Gateways.Repositories;
 using Xunit;
 
 namespace Web.Api.IntegrationTests.Controllers
 {
     public class PlayersControllerIntegrationTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    //public class PlayersControllerIntegrationTests 
     {
-        private readonly HttpClient _client;
+        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private HttpClient _client;
 
         public PlayersControllerIntegrationTests(CustomWebApplicationFactory<Startup> factory)
         {
-            _client = factory.CreateClient();
+            _factory = factory;
+         
         }
 
         [Fact]
         public async Task CanGetPlayers()
         {
+            Action<IServiceCollection> applyTestServices = services =>
+            {
+                services.AddScoped<ILoggerService, TestLoggerService>();
+            };
+
+            var _client = _factory.WithWebHostBuilder(builder =>
+                {
+                    builder.ConfigureTestServices(applyTestServices);
+                })
+                .CreateClient();
+
+
             // The endpoint or route of the controller action.
             var httpResponse = await _client.GetAsync("/api/players");
 

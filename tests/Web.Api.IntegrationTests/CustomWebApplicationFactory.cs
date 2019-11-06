@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Linq;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Web.Api.Core.Interfaces.Gateways.Repositories;
 using Web.Api.Infrastructure.Data;
+using Web.Api.IntegrationTests.Controllers;
 
 namespace Web.Api.IntegrationTests
 {
@@ -22,12 +27,13 @@ namespace Web.Api.IntegrationTests
                 // Add a database context (AppDbContext) using an in-memory database for testing.
                 services.AddDbContext<AppDbContext>(options =>
                 {
-                    options.UseInMemoryDatabase("InMemoryAppDb");
+                    options.UseInMemoryDatabase("IntegrationTests");
                     options.UseInternalServiceProvider(serviceProvider);
                 });
 
                 // Build the service provider.
                 var sp = services.BuildServiceProvider();
+
 
                 // Create a scope to obtain a reference to the database contexts
                 using (var scope = sp.CreateScope())

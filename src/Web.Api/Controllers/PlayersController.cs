@@ -11,10 +11,12 @@ namespace Web.Api.Controllers
     public class PlayersController : ControllerBase
     {
         private readonly IPlayerRepository _playerRepository;
+        private readonly ILoggerService _loggerService;
 
-        public PlayersController(IPlayerRepository playerRepository)
+        public PlayersController(IPlayerRepository playerRepository, ILoggerService loggerService)
         {
             _playerRepository = playerRepository;
+            _loggerService = loggerService;
         }
 
         // GET api/players
