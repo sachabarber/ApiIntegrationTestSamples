@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Web.Api.Core.Interfaces.Gateways.Repositories;
 using Web.Api.Infrastructure.Data;
 using Web.Api.Infrastructure.Data.Repositories;
+using Web.Api.Settings;
 
 
 namespace Web.Api
@@ -24,11 +26,24 @@ namespace Web.Api
         public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=players.db"));
-            
+
+            services.AddOptions();
+
+            IConfigurationSection sec = Configuration.GetSection("OrdersService");
+            services.Configure<OrderOptions>(sec);
+            services.Configure<MyOptions>(Configuration);
+
             services.AddScoped<IPlayerRepository, PlayerRepository>();
             services.AddScoped<ILoggerService, LoggerService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+
+            ServiceProvider sp = services.BuildServiceProvider();
+            IOptionsMonitor<MyOptions> iop = sp.GetService<IOptionsMonitor<MyOptions>>();
+
+
+            MyOptions op = iop.CurrentValue;
 
         }
 
